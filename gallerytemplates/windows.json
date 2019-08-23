@@ -1,221 +1,447 @@
 {
-    "version": "Notebook/1.0",
-    "items": [
-      {
-        "type": 1,
-        "content": {
-          "json": ""
-        },
-        "customWidth": "100",
-        "name": "text - 5"
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": ""
       },
-      {
-        "type": 1,
-        "content": {
-          "json": "# Azure Automation Windows Update Summary for All Subscriptions\r\n\r\nThis workbook can query multiple Log Analytics Workspaces. The Azure Automation Update Management solution needs to be linked to every Log Analytics Workspaces you wish to use it with."
-        },
-        "name": "text - 6"
+      "customWidth": "100",
+      "name": "TextNewLine"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "# Azure Automation Windows Update Summary for All Subscriptions\r\n\r\nThis workbook can query multiple Log Analytics Workspaces. The Azure Automation Update Management solution needs to be linked to every Log Analytics Workspaces you wish to use it with."
       },
-      {
-        "type": 3,
-        "content": {
-          "version": "KqlItem/1.0",
-          "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
-          "size": 2,
-          "queryType": 0,
-          "resourceType": "microsoft.operationalinsights/workspaces",
-          "crossComponentResources": [
-            "/subscriptions/replaceYourSubscription/resourceGroups/replaceYourResourceGroup/providers/Microsoft.OperationalInsights/workspaces/replaceYourWorkspace"
-          ],
-          "visualization": "piechart",
-          "tileSettings": {
-            "showBorder": false,
-            "titleContent": {
-              "columnMatch": "Classification",
-              "formatter": 1
+      "name": "TextSubject"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "query": "",
+        "crossComponentResources": [
+          "value::selected"
+        ],
+        "parameters": [
+          {
+            "id": "65d37ea2-0cd5-4a09-bce2-829ca294f123",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "label": "Time Range",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 43200000
             },
-            "leftContent": {
-              "columnMatch": "UpdatesNeeded",
-              "formatter": 12,
-              "formatOptions": {
-                "palette": "auto"
-              },
-              "numberFormat": {
-                "unit": 17,
-                "options": {
-                  "maximumSignificantDigits": 3,
-                  "maximumFractionDigits": 2
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
                 }
+              ],
+              "allowCustom": true
+            }
+          },
+          {
+            "id": "478d2e11-fa8d-492c-a2d4-1d2c7c4ec124",
+            "version": "KqlParameterItem/1.0",
+            "name": "DefaultSubscription_Internal",
+            "type": 1,
+            "isRequired": true,
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| take 1\r\n| project subscriptionId",
+            "crossComponentResources": [
+              "value::selected"
+            ],
+            "isHiddenWhenLocked": true,
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "2b8e9932-a015-407d-9cda-19519f0ed906",
+            "version": "KqlParameterItem/1.0",
+            "name": "SubscriptionName",
+            "label": "Subscription Name",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "summarize by subscriptionId\r\n| project value = strcat(\"/subscriptions/\", subscriptionId), label = subscriptionId, selected = iff(subscriptionId =~ '{DefaultSubscription_Internal}', true, false)",
+            "crossComponentResources": [
+              "value::selected"
+            ],
+            "value": [
+              "/subscriptions/c311ec4e-b0b0-4d81-99b9-16d4984c964f"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": []
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "02a36a60-7438-4177-86e4-9fd10fe297e7",
+            "version": "KqlParameterItem/1.0",
+            "name": "LogAnalyticsWorkspace",
+            "label": "Log Analytics Workspace",
+            "type": 5,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project id",
+            "crossComponentResources": [
+              "{SubscriptionName}"
+            ],
+            "value": [
+              "/subscriptions/c311ec4e-b0b0-4d81-99b9-16d4984c964f/resourceGroups/shared-prod-shared-resources/providers/Microsoft.OperationalInsights/workspaces/shared-prod-shared-la"
+            ],
+            "typeSettings": {
+              "resourceTypeFilter": {
+                "microsoft.operationalinsights/workspaces": true
+              },
+              "additionalResourceOptions": []
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          }
+        ],
+        "style": "above",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "QueryParameters"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Windows Updates need by Classification"
+      },
+      "customWidth": "50",
+      "name": "TextClassification"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Top 5 Windows Machines by Update Count"
+      },
+      "customWidth": "50",
+      "name": "TextTopMachine"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Update\r\n| where TimeGenerated {TimeRange} and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated {TimeRange} and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| summarize UpdatesNeeded=count(Classification) by Classification",
+        "size": 2,
+        "noDataMessage": "No data",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{LogAnalyticsWorkspace}"
+        ],
+        "visualization": "piechart",
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "Classification",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "UpdatesNeeded",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
               }
             }
           }
-        },
-        "customWidth": "50",
-        "name": "query - 0"
+        }
       },
-      {
-        "type": 3,
-        "content": {
-          "version": "KqlItem/1.0",
-          "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| project Computer, Title, Classification, PublishedDate, UpdateState, Product\r\n| summarize count(Classification) by Computer \r\n| top 5 by count_Classification desc ",
-          "size": 2,
-          "queryType": 0,
-          "resourceType": "microsoft.operationalinsights/workspaces",
-          "crossComponentResources": [
-            "/subscriptions/replaceYourSubscription/resourceGroups/replaceYourResourceGroup/providers/Microsoft.OperationalInsights/workspaces/replaceYourWorkspace"
-          ],
-          "visualization": "piechart"
+      "customWidth": "50",
+      "name": "PieClassification"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Update\r\n| where TimeGenerated {TimeRange} and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated {TimeRange} and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false\r\n| project Computer, Title, Classification, PublishedDate, UpdateState, Product\r\n| summarize count(Classification) by Computer \r\n| top 5 by count_Classification desc ",
+        "size": 2,
+        "noDataMessage": "No data",
+        "timeContext": {
+          "durationMs": 0
         },
-        "customWidth": "50",
-        "name": "top five Computers Needing Updates"
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{LogAnalyticsWorkspace}"
+        ],
+        "visualization": "piechart"
       },
-      {
-        "type": 1,
-        "content": {
-          "json": "## Windows Updates need by Classification"
+      "customWidth": "50",
+      "name": "PieTopMachine"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Heatmap of Update Summary by Computer\r\n\r\n💡 This section is dynamic, by selecting a row that row's Computer name will be exported to populate Updates needed by Server"
+      },
+      "name": "TextUpdatesSummary"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Heartbeat\r\n| where TimeGenerated {TimeRange} and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId\r\n| where Solutions has \"updates\"\r\n| extend vmuuId=VMUUID, azureResourceId=ResourceId, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), scopedToUpdatesSolution=true, lastUpdateAgentSeenTime=\"\"\r\n| join kind=leftouter\r\n(\r\n    Update\r\n    | where TimeGenerated {TimeRange} and OSType!=\"Linux\" and SourceComputerId in ((Heartbeat\r\n    | where TimeGenerated {TimeRange} and OSType=~\"Windows\" and notempty(Computer)\r\n    | summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n    | where Solutions has \"updates\"\r\n    | distinct SourceComputerId))\r\n    | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, Title, Optional, Approved, Computer, ComputerEnvironment) by Computer, SourceComputerId, UpdateID\r\n    | summarize Computer=any(Computer), ComputerEnvironment=any(ComputerEnvironment), missingCriticalUpdatesCount=countif(Classification has \"Critical\" and UpdateState=~\"Needed\" and Approved!=false), missingSecurityUpdatesCount=countif(Classification has \"Security\" and UpdateState=~\"Needed\" and Approved!=false), missingOtherUpdatesCount=countif(Classification !has \"Critical\" and Classification !has \"Security\" and UpdateState=~\"Needed\" and Optional==false and Approved!=false), lastAssessedTime=max(TimeGenerated), lastUpdateAgentSeenTime=\"\" by SourceComputerId\r\n    | extend compliance=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0, 2, 1)\r\n    | extend ComplianceOrder=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0 or missingOtherUpdatesCount > 0, 1, 3)\r\n)\r\non SourceComputerId\r\n| project id=SourceComputerId, displayName=Computer, sourceComputerId=SourceComputerId, scopedToUpdatesSolution=true, missingCriticalUpdatesCount=coalesce(missingCriticalUpdatesCount, -1), missingSecurityUpdatesCount=coalesce(missingSecurityUpdatesCount, -1), missingOtherUpdatesCount=coalesce(missingOtherUpdatesCount, -1), compliance=coalesce(compliance, 4), lastAssessedTime, lastUpdateAgentSeenTime, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), ComplianceOrder=coalesce(ComplianceOrder, 2) \r\n| order by ComplianceOrder asc, missingCriticalUpdatesCount desc, missingSecurityUpdatesCount desc, missingOtherUpdatesCount desc, displayName asc\r\n| project displayName, scopedToUpdatesSolution, CriticalUpdates=missingCriticalUpdatesCount, SecurityUpdates=missingSecurityUpdatesCount, OtherUpdates=missingOtherUpdatesCount, compliance, osType, Environment=environment, lastAssessedTime, lastUpdateAgentSeenTime\r\n| extend osType = replace(@\"2\", @\"Windows\", tostring(osType))\r\n| extend osType = replace(@\"1\", @\"Linux\", tostring(osType))\r\n| extend Environment = replace(@\"2\", @\"Non-Azure\", tostring(Environment))\r\n| extend Environment = replace(@\"1\", @\"Azure\", tostring(Environment))",
+        "size": 0,
+        "exportFieldName": "displayName",
+        "exportParameterName": "Computer",
+        "noDataMessage": "No data",
+        "timeContext": {
+          "durationMs": 0
         },
-        "customWidth": "50",
-        "name": "text - 7"
-      },
-      {
-        "type": 1,
-        "content": {
-          "json": "## Top 5 Windows Machines by Update Count"
-        },
-        "customWidth": "50",
-        "name": "text - 8"
-      },
-      {
-        "type": 1,
-        "content": {
-          "json": "## Heatmap of Update Summary by Computer\r\n\r\nThis section is dynamic, by selecting a row that row's Computer name will be exported to populate Updates needed by Server"
-        },
-        "name": "text - 9"
-      },
-      {
-        "type": 3,
-        "content": {
-          "version": "KqlItem/1.0",
-          "query": "Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions, Computer, ResourceId, ComputerEnvironment, VMUUID) by SourceComputerId\r\n| where Solutions has \"updates\"\r\n| extend vmuuId=VMUUID, azureResourceId=ResourceId, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), scopedToUpdatesSolution=true, lastUpdateAgentSeenTime=\"\"\r\n| join kind=leftouter\r\n(\r\n    Update\r\n    | where TimeGenerated>ago(14h) and OSType!=\"Linux\" and SourceComputerId in ((Heartbeat\r\n    | where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n    | summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n    | where Solutions has \"updates\"\r\n    | distinct SourceComputerId))\r\n    | summarize hint.strategy=partitioned arg_max(TimeGenerated, UpdateState, Classification, Title, Optional, Approved, Computer, ComputerEnvironment) by Computer, SourceComputerId, UpdateID\r\n    | summarize Computer=any(Computer), ComputerEnvironment=any(ComputerEnvironment), missingCriticalUpdatesCount=countif(Classification has \"Critical\" and UpdateState=~\"Needed\" and Approved!=false), missingSecurityUpdatesCount=countif(Classification has \"Security\" and UpdateState=~\"Needed\" and Approved!=false), missingOtherUpdatesCount=countif(Classification !has \"Critical\" and Classification !has \"Security\" and UpdateState=~\"Needed\" and Optional==false and Approved!=false), lastAssessedTime=max(TimeGenerated), lastUpdateAgentSeenTime=\"\" by SourceComputerId\r\n    | extend compliance=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0, 2, 1)\r\n    | extend ComplianceOrder=iff(missingCriticalUpdatesCount > 0 or missingSecurityUpdatesCount > 0 or missingOtherUpdatesCount > 0, 1, 3)\r\n)\r\non SourceComputerId\r\n| project id=SourceComputerId, displayName=Computer, sourceComputerId=SourceComputerId, scopedToUpdatesSolution=true, missingCriticalUpdatesCount=coalesce(missingCriticalUpdatesCount, -1), missingSecurityUpdatesCount=coalesce(missingSecurityUpdatesCount, -1), missingOtherUpdatesCount=coalesce(missingOtherUpdatesCount, -1), compliance=coalesce(compliance, 4), lastAssessedTime, lastUpdateAgentSeenTime, osType=2, environment=iff(ComputerEnvironment=~\"Azure\", 1, 2), ComplianceOrder=coalesce(ComplianceOrder, 2) \r\n| order by ComplianceOrder asc, missingCriticalUpdatesCount desc, missingSecurityUpdatesCount desc, missingOtherUpdatesCount desc, displayName asc\r\n| project displayName, scopedToUpdatesSolution, CriticalUpdates=missingCriticalUpdatesCount, SecurityUpdates=missingSecurityUpdatesCount, OtherUpdates=missingOtherUpdatesCount, compliance, osType, Environment=environment, lastAssessedTime, lastUpdateAgentSeenTime\r\n| extend osType = replace(@\"2\", @\"Windows\", tostring(osType))\r\n| extend osType = replace(@\"1\", @\"Linux\", tostring(osType))\r\n| extend Environment = replace(@\"2\", @\"Non-Azure\", tostring(Environment))\r\n| extend Environment = replace(@\"1\", @\"Azure\", tostring(Environment))",
-          "size": 0,
-          "exportFieldName": "displayName",
-          "exportParameterName": "Computer",
-          "queryType": 0,
-          "resourceType": "microsoft.operationalinsights/workspaces",
-          "crossComponentResources": [
-            "/subscriptions/replaceYourSubscription/resourceGroups/replaceYourResourceGroup/providers/Microsoft.OperationalInsights/workspaces/replaceYourWorkspace"
-          ],
-          "visualization": "table",
-          "gridSettings": {
-            "formatters": [
-              {
-                "columnMatch": "displayName",
-                "formatter": 0,
-                "formatOptions": {
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "scopedToUpdatesSolution",
-                "formatter": 0,
-                "formatOptions": {
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "CriticalUpdates",
-                "formatter": 8,
-                "formatOptions": {
-                  "min": 0,
-                  "max": 1,
-                  "palette": "greenRed",
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "SecurityUpdates",
-                "formatter": 8,
-                "formatOptions": {
-                  "min": 0,
-                  "max": 5,
-                  "palette": "greenRed",
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "OtherUpdates",
-                "formatter": 8,
-                "formatOptions": {
-                  "min": 0,
-                  "max": 5,
-                  "palette": "greenRed",
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "compliance",
-                "formatter": 8,
-                "formatOptions": {
-                  "min": 1,
-                  "max": 2,
-                  "palette": "greenRed",
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "osType",
-                "formatter": 0,
-                "formatOptions": {
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "Environment",
-                "formatter": 0,
-                "formatOptions": {
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "lastAssessedTime",
-                "formatter": 0,
-                "formatOptions": {
-                  "showIcon": true
-                }
-              },
-              {
-                "columnMatch": "lastUpdateAgentSeenTime",
-                "formatter": 0,
-                "formatOptions": {
-                  "showIcon": true
-                }
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{LogAnalyticsWorkspace}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "displayName",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
               }
-            ]
-          }
-        },
-        "name": "query - 2"
+            },
+            {
+              "columnMatch": "scopedToUpdatesSolution",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "CriticalUpdates",
+              "formatter": 8,
+              "formatOptions": {
+                "min": 0,
+                "max": 1,
+                "palette": "greenRed",
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "SecurityUpdates",
+              "formatter": 8,
+              "formatOptions": {
+                "min": 0,
+                "max": 5,
+                "palette": "greenRed",
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "OtherUpdates",
+              "formatter": 8,
+              "formatOptions": {
+                "min": 0,
+                "max": 5,
+                "palette": "greenRed",
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "compliance",
+              "formatter": 8,
+              "formatOptions": {
+                "min": 1,
+                "max": 2,
+                "palette": "greenRed",
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "osType",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Environment",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "lastAssessedTime",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "lastUpdateAgentSeenTime",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            }
+          ],
+          "labelSettings": []
+        }
       },
-      {
-        "type": 1,
-        "content": {
-          "json": "## Updates Needed by Server"
-        },
-        "name": "text - 10"
+      "name": "HeatMapUpdatesSummary"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Updates Needed by Server\r\n\r\n💡 Click on a computer name in the heatmap above to populate the list below"
       },
-      {
-        "type": 3,
-        "content": {
-          "version": "KqlItem/1.0",
-          "query": "Update\r\n| where TimeGenerated>ago(14h) and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated>ago(12h) and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false and Computer=='{Computer}'\r\n| project Computer, Title, Classification, PublishedDate, UpdateState, Product",
-          "size": 0,
-          "queryType": 0,
-          "resourceType": "microsoft.operationalinsights/workspaces",
-          "crossComponentResources": [
-            "/subscriptions/replaceYourSubscription/resourceGroups/replaceYourResourceGroup/providers/Microsoft.OperationalInsights/workspaces/replaceYourWorkspace"
+      "name": "TextUpdatesNeeded"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "Update\r\n| where TimeGenerated {TimeRange} and OSType!=\"Linux\" and (Optional==false or Classification has \"Critical\" or Classification has \"Security\") and SourceComputerId in ((Heartbeat\r\n| where TimeGenerated {TimeRange} and OSType=~\"Windows\" and notempty(Computer)\r\n| summarize arg_max(TimeGenerated, Solutions) by SourceComputerId\r\n| where Solutions has \"updates\" | distinct SourceComputerId))\r\n| summarize hint.strategy=partitioned arg_max(TimeGenerated, *) by Computer, SourceComputerId, UpdateID\r\n| where UpdateState=~\"Needed\" and Approved!=false and Computer=='{Computer}'\r\n| project Computer, Title, Classification, PublishedDate, UpdateState, Product",
+        "size": 0,
+        "noDataMessage": "No data",
+        "timeContext": {
+          "durationMs": 0
+        },
+        "timeContextFromParameter": "TimeRange",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{LogAnalyticsWorkspace}"
+        ],
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Computer",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Title",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Classification",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "PublishedDate",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "UpdateState",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Product",
+              "formatter": 0,
+              "formatOptions": {
+                "showIcon": true
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "Computer",
+              "label": ""
+            },
+            {
+              "columnId": "Title"
+            },
+            {
+              "columnId": "Classification"
+            },
+            {
+              "columnId": "PublishedDate"
+            },
+            {
+              "columnId": "UpdateState"
+            },
+            {
+              "columnId": "Product"
+            }
           ]
-        },
-        "name": "query - 4"
-      }
-    ],
-    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
-  }
+        }
+      },
+      "name": "ListUpdatesNeeded"
+    }
+  ],
+  "styleSettings": {},
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
