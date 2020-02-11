@@ -20,11 +20,16 @@ I would like to parameterize the ARM template for automated deployments, but the
 
 
 ## Screen Grabs
-![image](./images/2019-06-26_11-17-24.png)
+Windows example
+![image](./images/2020-02-11_11-20-09.png)
 
-![image](./images/2019-06-26_11-17-49.png)
+Linux and Windows example
 
-![image](./images/2019-06-26_11-18-20.png)
+![image](./images/2020-02-11_11-21-10.png)
+
+![image](./images/2020-02-11_11-21-36.png)
+
+
 
 
 ## GIF Output
@@ -34,7 +39,6 @@ I would like to parameterize the ARM template for automated deployments, but the
 
 Below are some improvements I will make when available or as time permits.
 
-- Color Palette of pie charts, at present you cannot set them. The dev team for Workbooks is aware of this and working on it
+
 - Heatmap for ScopedtoSolution, at present you can set a heatmap for boolean value, but it doesn't work unless you change true and false to 1 and 0.
 - get LastUpdateAgentseenTime working
-- Scope the entire workbook to the subscription(s) you want. As it is currently I have not found a way to scope all queries to all workspaces, you have to set it each time you create a new query.
