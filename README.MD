@@ -14,9 +14,7 @@ The Log Analyitcs workspace and Azure Automation account need to be linked toget
 https://www.systemcenterautomation.com/2019/06/azure-automation-update-management-workbook/
 
 ## Install
-For now you'll have to copy and paste the Gallery Template of the Workbook you want to use. You'll need to find and replace "replaceYourWorkspace" "replaceYourResourceGroup" and "replaceYourSubscription" or you can import and fix after the fact.
-
-I would like to parameterize the ARM template for automated deployments, but the export has the workspace inside the serialized data. So if you have the time and know what you're doing feel free to improve that and submit a pull request.
+You should now be able to drag and drop the workbook into your environment. Because workspace is parameterized to pull in all workspaces from all subscriptions.
 
 
 ## Screen Grabs
