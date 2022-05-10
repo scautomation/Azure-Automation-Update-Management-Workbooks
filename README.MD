@@ -40,3 +40,4 @@ Below are some improvements I will make when available or as time permits.
 
 - Heatmap for ScopedtoSolution, at present you can set a heatmap for boolean value, but it doesn't work unless you change true and false to 1 and 0.
 - get LastUpdateAgentseenTime working
+- Updates to the linuxwindows gallerytemplate to include two new tabs. One tab for Computers querying all computer related items. One tab for alerts querying all related metrics to the update management solution in the automation account. 
